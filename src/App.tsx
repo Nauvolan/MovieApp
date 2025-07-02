@@ -1,8 +1,25 @@
+import { useState } from "react";
 import "./App.css";
-import React from "react";
+import heroBbanner from "./assets/img/hero-img.png";
+import Search from "./components/Search";
 
 const App = () => {
-  return <div>App</div>;
+  const [searchTerm, setSearchTerm] = useState("");
+  return (
+    <>
+      <div className="pattern" />
+      <div className="wrapper">
+        <header>
+          <img src={heroBbanner} alt="Hero Banner" />
+          <h1>
+            Find <span className="text-gradient"> movies</span> you'll enjoy
+            without the hassle
+          </h1>
+        </header>
+        <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      </div>
+    </>
+  );
 };
 
 export default App;
