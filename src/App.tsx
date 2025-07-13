@@ -2,49 +2,18 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import heroBbanner from "./assets/img/hero-img.png";
 import Search from "./components/Search";
+import { useMovie } from "./hooks/useMovie";
+import type { Movie } from "./interfaces/Movies";
 
-const API_BASE_URL = "https://api.themoviedb.org/3";
-const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const API_OPTIONS = {
-  method: "GET",
-  headers: {
-    accept: "application/json",
-    Authorization: `Bearer ${API_KEY}`,
-  },
-};
 const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [moviesList, setMoviesList] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { movieList, errorMessage, isLoading, searchMovies } = useMovie();
 
-  const fetchMovies = async () => {
-    setIsLoading(true);
-    try {
-      const endpoint = `${API_BASE_URL}/search/movie?query=${searchTerm}&language=en-US&page=1&include_adult=false`;
-      const response = await fetch(endpoint, API_OPTIONS);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      setMoviesList(data);
-    } catch (error) {
-      if (error instanceof Error) {
-        setErrorMessage("Error fetching movies:" + error.message);
-      } else {
-        setErrorMessage("Error fetching movies: An unknown error occurred.");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
   useEffect(() => {
     if (searchTerm) {
-      fetchMovies();
-    } else {
-      setErrorMessage("Please enter a search term.");
+      searchMovies({ searchTerm });
     }
-  }, [searchTerm]);
+  }, [searchTerm, searchMovies]);
   return (
     <>
       <div className="pattern" />
@@ -57,7 +26,18 @@ const App = () => {
           </h1>
         </header>
         <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        {/* {isLoading ? <h6 className="text-white">loading</h6> : null} */}
+        {movieList.length > 0 && (
+          <div className="movies-list">
+            <ol>
+              {movieList.map((movie: Movie) => (
+                <li key={movie.id} className="text-white">
+                  {movie.title}
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+        /* {isLoading ? <h6 className="text-white">loading</h6> : null} */
       </div>
     </>
   );
